@@ -12,6 +12,8 @@ export interface CreatedPlaylistResponse {
   name: string;
   year: string;
   addedCount: number;
+  skippedCount?: number;
+  alreadyExisted?: boolean;
 }
 
 export async function fetchLikedTracksPageApi(
@@ -116,6 +118,8 @@ export function useSpotifySync() {
           name: result.name,
           url: result.playlistUrl,
           addedCount: result.addedCount,
+          skippedCount: result.skippedCount,
+          alreadyExisted: result.alreadyExisted,
         });
 
         store.setCreatedPlaylists([...createdPlaylists]);
