@@ -22,10 +22,10 @@ const isHttps =
   (process.env.NEXT_PUBLIC_APP_URL && process.env.NEXT_PUBLIC_APP_URL.startsWith("https://")) ||
   Boolean(process.env.VERCEL);
 
+const configuredPassword = process.env.SESSION_PASSWORD;
+
 export const sessionOptions: SessionOptions = {
-  password:
-    process.env.SESSION_PASSWORD ||
-    "complex_password_at_least_32_characters_long_for_spotify_app_2025",
+  password: configuredPassword as string,
   cookieName: "yearly_spotify_session",
   cookieOptions: {
     // Enable Secure only on HTTPS connections (SSL / production), not on local HTTP
@@ -37,6 +37,10 @@ export const sessionOptions: SessionOptions = {
 };
 
 export async function getSession() {
+  if (!process.env.SESSION_PASSWORD) {
+    throw new Error("Missing required SESSION_PASSWORD environment variable");
+  }
+
   const cookieStore = await cookies();
   const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
 

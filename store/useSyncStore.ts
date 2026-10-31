@@ -2,13 +2,7 @@ import { create } from "zustand";
 import type { SpotifyTrackItem } from "@/lib/spotify";
 import type { YearStats } from "@/lib/sync";
 
-export type SyncStatus =
-  | "idle"
-  | "fetching"
-  | "analyzing"
-  | "creating"
-  | "completed"
-  | "error";
+export type SyncStatus = "idle" | "fetching" | "analyzing" | "creating" | "completed" | "error";
 
 export interface CreatedPlaylistRecord {
   year: number;
@@ -129,10 +123,11 @@ export const useSyncStore = create<SyncState>((set) => ({
 
   setStats: (stats: YearStats) => set({ stats }),
 
-  setCreatedPlaylists: (createdPlaylists: CreatedPlaylistRecord[]) =>
-    set({ createdPlaylists }),
+  setCreatedPlaylists: (createdPlaylists: CreatedPlaylistRecord[]) => set({ createdPlaylists }),
 
-  setCompleted: (actionMessage = "¡Listo! Todas tus playlists anuales han sido generadas con éxito.") =>
+  setCompleted: (
+    actionMessage = "¡Listo! Todas tus playlists anuales han sido generadas con éxito."
+  ) =>
     set({
       status: "completed",
       currentAction: actionMessage,

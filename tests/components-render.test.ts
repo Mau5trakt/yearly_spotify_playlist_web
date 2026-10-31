@@ -1,14 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import React from "react";
 import { renderToString } from "react-dom/server";
-import {
-  Header,
-  LandingHero,
-  ProgressBar,
-  StatsView,
-  PlaylistsView,
-  LiveTrackToasts,
-} from "../components";
+import { Header, LandingHero, ProgressBar, StatsView, LiveTrackToasts } from "../components";
 
 describe("Component Rendering & SVG Safety Suite", () => {
   it("renders Header with explicitly sized SVG logo (width=32, height=32)", () => {

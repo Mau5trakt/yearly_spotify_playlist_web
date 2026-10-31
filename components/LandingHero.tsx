@@ -15,19 +15,16 @@ export function LandingHero({ authError }: LandingHeroProps) {
       </div>
 
       <h1 className={styles.title}>
-        Tus canciones favoritas,{" "}
-        <span className={styles.highlight}>organizadas por año</span>
+        Tus canciones favoritas, <span className={styles.highlight}>organizadas por año</span>
       </h1>
 
       <p className={styles.description}>
-        Conectá tu cuenta de Spotify y generá automáticamente playlists dedicadas
-        para cada año según la fecha en que diste Me Gusta a tus canciones.
+        Conectá tu cuenta de Spotify y generá automáticamente playlists dedicadas para cada año
+        según la fecha en que diste Me Gusta a tus canciones.
       </p>
 
       {authError && (
-        <div className={styles.errorNotice}>
-          ⚠️ Error al conectar con Spotify: {authError}
-        </div>
+        <div className={styles.errorNotice}>⚠️ Error al conectar con Spotify: {authError}</div>
       )}
 
       <div className={styles.ctaWrapper}>
@@ -50,8 +47,8 @@ export function LandingHero({ authError }: LandingHeroProps) {
           <div className={styles.cardNumber}>1</div>
           <h3 className={styles.cardTitle}>Conectá tu cuenta</h3>
           <p className={styles.cardText}>
-            Acceso seguro con OAuth oficial de Spotify. Tus credenciales nunca se
-            almacenan en nuestros servidores.
+            Acceso seguro con OAuth oficial de Spotify. Tus credenciales nunca se almacenan en
+            nuestros servidores.
           </p>
         </div>
 
@@ -59,8 +56,8 @@ export function LandingHero({ authError }: LandingHeroProps) {
           <div className={styles.cardNumber}>2</div>
           <h3 className={styles.cardTitle}>Escanéo por lotes</h3>
           <p className={styles.cardText}>
-            Leemos tu biblioteca en segundo plano y agrupamos cada tema según el año
-            en el que lo guardaste sin bloqueos.
+            Leemos tu biblioteca en segundo plano y agrupamos cada tema según el año en el que lo
+            guardaste sin bloqueos.
           </p>
         </div>
 
@@ -68,8 +65,8 @@ export function LandingHero({ authError }: LandingHeroProps) {
           <div className={styles.cardNumber}>3</div>
           <h3 className={styles.cardTitle}>Playlists Anuales Listas</h3>
           <p className={styles.cardText}>
-            Se generan las listas anuales directamente en tu Spotify para que las
-            escuches en cualquier dispositivo.
+            Se generan las listas anuales directamente en tu Spotify para que las escuches en
+            cualquier dispositivo.
           </p>
         </div>
       </div>

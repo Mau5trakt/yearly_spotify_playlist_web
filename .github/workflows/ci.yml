@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Lint, Format, Test & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check code formatting (Prettier)
+        run: bun run format:check
+
+      - name: Run linter (ESLint)
+        run: bun run lint
+
+      - name: Run test suites (Bun Test)
+        run: bun test
+
+      - name: Build Next.js application
+        run: bun run build
+        env:
+          SPOTIFY_CLIENT_ID: mock-client-id-for-ci
+          SPOTIFY_CLIENT_SECRET: mock-client-secret-for-ci
+          SPOTIFY_REDIRECT_URI: http://127.0.0.1:3000/api/auth/callback
+          SESSION_PASSWORD: mock_session_password_at_least_32_characters_long_for_ci
+          NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000

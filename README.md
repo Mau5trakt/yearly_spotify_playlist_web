@@ -14,26 +14,29 @@
 ## Quickstart
 
 ### 1. Install Dependencies
+
 ```bash
 bun install
 ```
 
 ### 2. Configure Environment Variables
+
 Copy the template and set up your Spotify app credentials in `.env.local`:
 
 ```bash
 cp .env.example .env.local
 ```
 
-| Variable | Description | Default |
-|---|---|---|
-| `SPOTIFY_CLIENT_ID` | Spotify Developer application Client ID | *Required* |
-| `SPOTIFY_CLIENT_SECRET` | Spotify Developer application Client Secret | *Required* |
-| `SPOTIFY_REDIRECT_URI` | OAuth callback URI (Spotify requires literal `127.0.0.1`) | `http://127.0.0.1:3000/api/auth/callback` |
-| `SESSION_PASSWORD` | Secret key (min. 32 characters) for encrypted session cookies | *Required* |
-| `NEXT_PUBLIC_APP_URL` | Base public URL of the application | `http://127.0.0.1:3000` |
+| Variable                | Description                                                   | Default                                   |
+| ----------------------- | ------------------------------------------------------------- | ----------------------------------------- |
+| `SPOTIFY_CLIENT_ID`     | Spotify Developer application Client ID                       | _Required_                                |
+| `SPOTIFY_CLIENT_SECRET` | Spotify Developer application Client Secret                   | _Required_                                |
+| `SPOTIFY_REDIRECT_URI`  | OAuth callback URI (Spotify requires literal `127.0.0.1`)     | `http://127.0.0.1:3000/api/auth/callback` |
+| `SESSION_PASSWORD`      | Secret key (min. 32 characters) for encrypted session cookies | _Required_                                |
+| `NEXT_PUBLIC_APP_URL`   | Base public URL of the application                            | `http://127.0.0.1:3000`                   |
 
 ### 3. Run the Development Server
+
 ```bash
 bun dev
 ```
@@ -122,7 +125,7 @@ Open **`http://127.0.0.1:3000`** in your browser and click **Log in with Spotify
 2. Create or select an application.
 3. In **Settings > Redirect URIs**, register:
    - `http://127.0.0.1:3000/api/auth/callback`  
-     *(Note: Spotify requires the literal `127.0.0.1` loopback IP; `localhost` is rejected by Spotify's OAuth policy).*
+     _(Note: Spotify requires the literal `127.0.0.1` loopback IP; `localhost` is rejected by Spotify's OAuth policy)._
 4. Copy the **Client ID** and **Client Secret** into `.env.local`.
 
 ---
