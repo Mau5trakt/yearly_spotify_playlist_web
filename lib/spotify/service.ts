@@ -1,6 +1,7 @@
 import { getValidAccessToken, SPOTIFY_API_BASE_URL } from "./client";
 import { getSession } from "../auth";
 import type { CreatePlaylistInput } from "./schemas";
+import { selectNewTracks, chunkArray } from "../sync/dedup";
 
 export interface SpotifyTrackItem {
   id: string;
@@ -97,19 +98,27 @@ async function addTrackBatchesSequentially(
   playlistId: string,
   batches: string[][],
   accessToken: string,
+  startPosition?: number,
   index = 0
 ): Promise<number> {
   if (index >= batches.length) return 0;
   const batch = batches[index];
+
+  const payload: { uris: string[]; position?: number } = {
+    uris: batch,
+  };
+
+  if (typeof startPosition === "number") {
+    payload.position = startPosition;
+  }
+
   const addRes = await fetch(`${SPOTIFY_API_BASE_URL}/playlists/${playlistId}/tracks`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      uris: batch,
-    }),
+    body: JSON.stringify(payload),
   });
 
   if (!addRes.ok) {
@@ -117,8 +126,62 @@ async function addTrackBatchesSequentially(
     throw new Error(`Failed to add tracks to playlist: ${addRes.status} ${errText}`);
   }
 
-  const nextCount = await addTrackBatchesSequentially(playlistId, batches, accessToken, index + 1);
+  const nextPosition = typeof startPosition === "number" ? startPosition + batch.length : undefined;
+
+  const nextCount = await addTrackBatchesSequentially(
+    playlistId,
+    batches,
+    accessToken,
+    nextPosition,
+    index + 1
+  );
   return batch.length + nextCount;
+}
+
+export async function fetchPlaylistTrackUris(
+  playlistId: string,
+  token?: string
+): Promise<Set<string>> {
+  const accessToken = token || (await getValidAccessToken());
+  const uris = new Set<string>();
+  const limit = 50;
+  let offset = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const url = `${SPOTIFY_API_BASE_URL}/playlists/${playlistId}/tracks?offset=${offset}&limit=${limit}`;
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Failed to fetch playlist tracks: ${res.status} ${errText}`);
+    }
+
+    const data = (await res.json()) as {
+      next: string | null;
+      items?: Array<{
+        track?: { uri?: string | null } | null;
+        item?: { uri?: string | null } | null;
+      }>;
+    };
+
+    const items = data.items || [];
+    for (const entry of items) {
+      const uri = entry.track?.uri || entry.item?.uri;
+      if (typeof uri === "string" && uri.trim().length > 0) {
+        uris.add(uri.trim());
+      }
+    }
+
+    offset += items.length;
+    hasMore = Boolean(data.next) && items.length > 0;
+  }
+
+  return uris;
 }
 
 export async function createOrUpdateYearlyPlaylist(input: CreatePlaylistInput) {
@@ -136,28 +199,47 @@ export async function createOrUpdateYearlyPlaylist(input: CreatePlaylistInput) {
   // 1. Check if a playlist with this name already exists
   let playlistId: string | null = null;
   let playlistUrl: string = "";
+  let alreadyExisted = false;
 
-  const userPlaylistsRes = await fetch(`${SPOTIFY_API_BASE_URL}/me/playlists?limit=50`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  let offset = 0;
+  let hasMorePlaylists = true;
 
-  if (userPlaylistsRes.ok) {
+  while (hasMorePlaylists) {
+    const userPlaylistsRes = await fetch(
+      `${SPOTIFY_API_BASE_URL}/me/playlists?offset=${offset}&limit=50`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (!userPlaylistsRes.ok) break;
+
     const playlistsData = (await userPlaylistsRes.json()) as {
+      next: string | null;
       items: Array<{
         id: string;
         name: string;
+        owner?: { id: string };
         external_urls: { spotify: string };
       }>;
     };
-    const existing = playlistsData.items?.find(
-      (p) => p.name.trim().toLowerCase() === playlistName.trim().toLowerCase()
-    );
+
+    const existing = playlistsData.items?.find((p) => {
+      const isOwned = !p.owner || p.owner.id === userId;
+      return isOwned && p.name.trim().toLowerCase() === playlistName.trim().toLowerCase();
+    });
+
     if (existing) {
       playlistId = existing.id;
       playlistUrl = existing.external_urls.spotify;
+      alreadyExisted = true;
+      break;
     }
+
+    offset += playlistsData.items?.length || 50;
+    hasMorePlaylists = Boolean(playlistsData.next) && (playlistsData.items?.length ?? 0) > 0;
   }
 
   // 2. If it does not exist, create it
@@ -188,43 +270,39 @@ export async function createOrUpdateYearlyPlaylist(input: CreatePlaylistInput) {
     playlistUrl = createdData.external_urls.spotify;
   }
 
-  // 3. Add tracks in batches of up to 100
-  const uniqueUris = Array.from(new Set(input.trackUris));
-  const BATCH_SIZE = 100;
+  // 3. Deduplicate against existing tracks in the playlist
+  let existingUris = new Set<string>();
+  if (alreadyExisted) {
+    existingUris = await fetchPlaylistTrackUris(playlistId, accessToken);
+  }
 
-  if (uniqueUris.length <= BATCH_SIZE) {
-    const addRes = await fetch(`${SPOTIFY_API_BASE_URL}/playlists/${playlistId}/tracks`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        uris: uniqueUris,
-      }),
-    });
+  const pendingUris = selectNewTracks(input.trackUris, existingUris);
+  const skippedCount = input.trackUris.length - pendingUris.length;
 
-    if (!addRes.ok) {
-      const errText = await addRes.text();
-      throw new Error(`Failed to add tracks to playlist: ${addRes.status} ${errText}`);
-    }
-
+  // 4. If all tracks already exist in the playlist, it's a safe no-op!
+  if (pendingUris.length === 0) {
     return {
       playlistId,
       playlistUrl,
       name: playlistName,
       year: input.year,
-      addedCount: uniqueUris.length,
+      addedCount: 0,
+      skippedCount,
+      alreadyExisted,
     };
   }
 
-  const batches: string[][] = [];
-  for (let i = 0; i < uniqueUris.length; i += BATCH_SIZE) {
-    batches.push(uniqueUris.slice(i, i + BATCH_SIZE));
-  }
+  // 5. Add pending tracks in batches of up to 100
+  // When reusing existing playlist, insert at position 0 to keep newest liked songs at the top
+  const insertPosition = alreadyExisted ? 0 : undefined;
+  const batches = chunkArray(pendingUris, 100);
 
-  // Sequentially process batches to strictly preserve track order and prevent 409/429 concurrency errors
-  const totalAdded = await addTrackBatchesSequentially(playlistId, batches, accessToken);
+  const totalAdded = await addTrackBatchesSequentially(
+    playlistId,
+    batches,
+    accessToken,
+    insertPosition
+  );
 
   return {
     playlistId,
@@ -232,5 +310,7 @@ export async function createOrUpdateYearlyPlaylist(input: CreatePlaylistInput) {
     name: playlistName,
     year: input.year,
     addedCount: totalAdded,
+    skippedCount,
+    alreadyExisted,
   };
 }

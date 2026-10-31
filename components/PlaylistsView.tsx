@@ -20,7 +20,13 @@ export function PlaylistsView({ playlists }: PlaylistsViewProps) {
             <div>
               <div className={styles.cardHeader}>
                 <span className={styles.playlistYear}>{p.year}</span>
-                <span className={styles.trackBadge}>{p.addedCount} temas</span>
+                <span className={styles.trackBadge}>
+                  {p.skippedCount && p.skippedCount > 0
+                    ? p.addedCount === 0
+                      ? `Al día (${p.skippedCount} temas)`
+                      : `+${p.addedCount} nuevos (${p.skippedCount} existentes)`
+                    : `${p.addedCount} temas`}
+                </span>
               </div>
               <div className={styles.playlistName}>{p.name}</div>
             </div>

@@ -9,6 +9,8 @@ export interface CreatedPlaylistRecord {
   name: string;
   url: string;
   addedCount: number;
+  skippedCount?: number;
+  alreadyExisted?: boolean;
 }
 
 interface SyncState {
