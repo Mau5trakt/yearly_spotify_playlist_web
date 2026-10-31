@@ -91,6 +91,19 @@ export const useSyncStore = create<SyncState>((set) => ({
       if (pendingTrackQueue.length > 0) {
         const randomIndex = Math.floor(Math.random() * pendingTrackQueue.length);
         const nextTrack = pendingTrackQueue.splice(randomIndex, 1)[0];
+
+        // Preload upcoming queue tracks into memory cache
+        if (typeof window !== "undefined") {
+          const aheadCount = Math.min(pendingTrackQueue.length, 3);
+          for (let i = 0; i < aheadCount; i++) {
+            const aheadUrl = pendingTrackQueue[i]?.album.imageUrl;
+            if (aheadUrl) {
+              const preloader = new Image();
+              preloader.src = aheadUrl;
+            }
+          }
+        }
+
         set((state) => ({
           latestTrack: nextTrack,
           recentTracks: [...state.recentTracks.slice(-4), nextTrack],
@@ -101,6 +114,18 @@ export const useSyncStore = create<SyncState>((set) => ({
 
   enqueueTracks: (tracks: SpotifyTrackItem[]) => {
     pendingTrackQueue.push(...tracks);
+
+    // Warm up the browser image cache for incoming tracks
+    if (typeof window !== "undefined") {
+      const warmupCount = Math.min(tracks.length, 15);
+      for (let i = 0; i < warmupCount; i++) {
+        const url = tracks[i]?.album.imageUrl;
+        if (url) {
+          const preloader = new Image();
+          preloader.src = url;
+        }
+      }
+    }
   },
 
   stopQueueTicker: () => {

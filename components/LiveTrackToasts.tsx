@@ -107,24 +107,34 @@ export function LiveTrackToasts({
       <div ref={trackListRef} className={styles.trackList}>
         {items.map((item) => (
           <div key={item.id} className={styles.toastCard} data-testid="toast-card">
-            {/* Album cover on the left (64px) */}
-            {item.track.album.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={item.track.album.imageUrl}
-                alt={item.track.name}
-                className={styles.coverImage}
-                data-testid="cover-image"
-                width={64}
-                height={64}
-              />
-            ) : (
-              <div className={styles.coverPlaceholder} data-testid="cover-placeholder">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-                </svg>
-              </div>
-            )}
+            {/* Album cover wrapper strictly bounded to 64x64 on the left */}
+            <div className={styles.coverWrapper}>
+              {item.track.album.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={item.track.album.imageUrl}
+                  alt={item.track.name}
+                  className={styles.coverImage}
+                  data-testid="cover-image"
+                  width={64}
+                  height={64}
+                  loading="eager"
+                  decoding="async"
+                  style={{
+                    width: "64px",
+                    height: "64px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
+                />
+              ) : (
+                <div className={styles.coverPlaceholder} data-testid="cover-placeholder">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                  </svg>
+                </div>
+              )}
+            </div>
 
             {/* Track info on the right */}
             <div className={styles.trackInfo} data-testid="track-info">
