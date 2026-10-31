@@ -93,6 +93,34 @@ export async function fetchLikedTracksPage(
   };
 }
 
+async function addTrackBatchesSequentially(
+  playlistId: string,
+  batches: string[][],
+  accessToken: string,
+  index = 0
+): Promise<number> {
+  if (index >= batches.length) return 0;
+  const batch = batches[index];
+  const addRes = await fetch(`${SPOTIFY_API_BASE_URL}/playlists/${playlistId}/tracks`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      uris: batch,
+    }),
+  });
+
+  if (!addRes.ok) {
+    const errText = await addRes.text();
+    throw new Error(`Failed to add tracks to playlist: ${addRes.status} ${errText}`);
+  }
+
+  const nextCount = await addTrackBatchesSequentially(playlistId, batches, accessToken, index + 1);
+  return batch.length + nextCount;
+}
+
 export async function createOrUpdateYearlyPlaylist(input: CreatePlaylistInput) {
   // Concurrently resolve token and session
   const [accessToken, session] = await Promise.all([getValidAccessToken(), getSession()]);
@@ -195,31 +223,14 @@ export async function createOrUpdateYearlyPlaylist(input: CreatePlaylistInput) {
     batches.push(uniqueUris.slice(i, i + BATCH_SIZE));
   }
 
-  await Promise.all(
-    batches.map(async (batch) => {
-      const addRes = await fetch(`${SPOTIFY_API_BASE_URL}/playlists/${playlistId}/tracks`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          uris: batch,
-        }),
-      });
-
-      if (!addRes.ok) {
-        const errText = await addRes.text();
-        throw new Error(`Failed to add tracks to playlist: ${addRes.status} ${errText}`);
-      }
-    })
-  );
+  // Sequentially process batches to strictly preserve track order and prevent 409/429 concurrency errors
+  const totalAdded = await addTrackBatchesSequentially(playlistId, batches, accessToken);
 
   return {
     playlistId,
     playlistUrl,
     name: playlistName,
     year: input.year,
-    addedCount: uniqueUris.length,
+    addedCount: totalAdded,
   };
 }
