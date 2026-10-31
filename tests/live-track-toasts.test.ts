@@ -58,7 +58,9 @@ describe("LiveTrackToasts TDD Suite", () => {
       },
     ];
 
-    const html = renderToString(React.createElement(LiveTrackToasts, { tracks: trackWithoutImage }));
+    const html = renderToString(
+      React.createElement(LiveTrackToasts, { tracks: trackWithoutImage })
+    );
     const placeholderIndex = html.indexOf('data-testid="cover-placeholder"');
     const infoIndex = html.indexOf('data-testid="track-info"');
 

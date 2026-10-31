@@ -32,11 +32,7 @@ export function Header({ user, onLogout }: HeaderProps) {
           <div className={styles.userBadge}>
             {user.imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={user.imageUrl}
-                alt={user.displayName}
-                className={styles.avatar}
-              />
+              <img src={user.imageUrl} alt={user.displayName} className={styles.avatar} />
             ) : (
               <div className={styles.avatarPlaceholder}>
                 {user.displayName.charAt(0).toUpperCase()}

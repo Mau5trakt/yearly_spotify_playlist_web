@@ -33,7 +33,9 @@ export function Dashboard({ user }: DashboardProps) {
     <div className={styles.dashboardContainer}>
       {error && (
         <div className={styles.errorBanner}>
-          <p><strong>Error:</strong> {error}</p>
+          <p>
+            <strong>Error:</strong> {error}
+          </p>
           <button
             onClick={reset}
             style={{
@@ -52,18 +54,13 @@ export function Dashboard({ user }: DashboardProps) {
 
       {status === "idle" && (
         <div className={styles.welcomeCard}>
-          <h1 className={styles.welcomeTitle}>
-            ¡Hola, {user.displayName}!
-          </h1>
+          <h1 className={styles.welcomeTitle}>¡Hola, {user.displayName}!</h1>
           <p className={styles.welcomeSubtitle}>
-            Todo listo para escanear tus canciones guardadas en Spotify y crear tus
-            playlists anuales de forma automática.
+            Todo listo para escanear tus canciones guardadas en Spotify y crear tus playlists
+            anuales de forma automática.
           </p>
 
-          <button
-            onClick={startSync}
-            className={styles.primaryButton}
-          >
+          <button onClick={startSync} className={styles.primaryButton}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M8 5v14l11-7z" />
             </svg>
@@ -90,8 +87,8 @@ export function Dashboard({ user }: DashboardProps) {
               🎉 ¡Sincronización Completada!
             </h1>
             <p className={styles.welcomeSubtitle}>
-              Revisá tus estadísticas a continuación o abrí tus nuevas playlists
-              directamente en tu aplicación de Spotify.
+              Revisá tus estadísticas a continuación o abrí tus nuevas playlists directamente en tu
+              aplicación de Spotify.
             </p>
             <button onClick={reset} className={styles.secondaryButton}>
               Volver a sincronizar

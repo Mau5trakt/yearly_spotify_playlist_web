@@ -13,12 +13,14 @@ interface ProgressBarProps {
   latestTrack?: SpotifyTrackItem | null;
 }
 
+const EMPTY_RECENT_TRACKS: SpotifyTrackItem[] = [];
+
 export function ProgressBar({
   currentAction,
   totalTracks,
   fetchedCount,
   status,
-  recentTracks = [],
+  recentTracks = EMPTY_RECENT_TRACKS,
   latestTrack,
 }: ProgressBarProps) {
   let percentage = 0;
@@ -50,15 +52,10 @@ export function ProgressBar({
         aria-valuemax={100}
         aria-label="Progreso de sincronización"
       >
-        <div
-          className={styles.progressBarFill}
-          style={{ width: `${percentage}%` }}
-        />
+        <div className={styles.progressBarFill} style={{ width: `${percentage}%` }} />
       </div>
 
-      {status === "fetching" && (
-        <LiveTrackToasts latestTrack={latestTrack} tracks={recentTracks} />
-      )}
+      {status === "fetching" && <LiveTrackToasts latestTrack={latestTrack} tracks={recentTracks} />}
     </div>
   );
 }

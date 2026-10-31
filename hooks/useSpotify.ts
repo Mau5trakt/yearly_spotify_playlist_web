@@ -1,12 +1,8 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api";
-import type {
-  TracksPageResponse,
-  CreatePlaylistInput,
-  SpotifyTrackItem,
-} from "@/lib/spotify";
+import type { TracksPageResponse, CreatePlaylistInput, SpotifyTrackItem } from "@/lib/spotify";
 import { groupTracksByYear, calculateYearStats } from "@/lib/sync";
 import { useSyncStore, type CreatedPlaylistRecord } from "@/store/useSyncStore";
 
@@ -31,16 +27,17 @@ export async function fetchLikedTracksPageApi(
 export async function createPlaylistApi(
   input: CreatePlaylistInput
 ): Promise<CreatedPlaylistResponse> {
-  const { data } = await apiClient.post<CreatedPlaylistResponse>(
-    "/api/spotify/playlists",
-    input
-  );
+  const { data } = await apiClient.post<CreatedPlaylistResponse>("/api/spotify/playlists", input);
   return data;
 }
 
 export function useCreatePlaylistMutation() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createPlaylistApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["spotify_playlists"] });
+    },
   });
 }
 
@@ -95,16 +92,17 @@ export function useSpotifySync() {
         `Se encontraron ${groups.size} años distintos. Preparando creación de playlists...`
       );
 
-      // Phase 3: Create yearly playlists via Axios mutation
+      // Phase 3: Create yearly playlists sequentially via Axios mutation
       const createdPlaylists: CreatedPlaylistRecord[] = [];
       const years = Array.from(groups.keys()).sort((a, b) => b - a);
 
-      for (let i = 0; i < years.length; i++) {
-        const year = years[i];
+      const syncYearStep = async (index: number) => {
+        if (index >= years.length) return;
+        const year = years[index];
         const group = groups.get(year)!;
 
         store.setCurrentAction(
-          `Creando playlist de ${year} (${i + 1}/${years.length}) con ${group.tracks.length} canciones...`
+          `Creando playlist de ${year} (${index + 1}/${years.length}) con ${group.tracks.length} canciones...`
         );
 
         const result = await createPlaylistMutation.mutateAsync({
@@ -121,11 +119,12 @@ export function useSpotifySync() {
         });
 
         store.setCreatedPlaylists([...createdPlaylists]);
-      }
+        await syncYearStep(index + 1);
+      };
 
-      store.setCompleted(
-        "¡Listo! Todas tus playlists anuales han sido generadas con éxito."
-      );
+      await syncYearStep(0);
+
+      store.setCompleted("¡Listo! Todas tus playlists anuales han sido generadas con éxito.");
     } catch (err) {
       store.stopQueueTicker();
       const message = err instanceof Error ? err.message : "Error en la sincronización";

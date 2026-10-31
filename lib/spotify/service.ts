@@ -66,7 +66,9 @@ export async function fetchLikedTracksPage(
     .filter((entry) => Boolean(entry.track && entry.track.id))
     .map((entry) => {
       const addedDate = new Date(entry.added_at);
-      const year = isNaN(addedDate.getFullYear()) ? new Date().getFullYear() : addedDate.getFullYear();
+      const year = isNaN(addedDate.getFullYear())
+        ? new Date().getFullYear()
+        : addedDate.getFullYear();
 
       return {
         id: entry.track.id,
@@ -91,9 +93,37 @@ export async function fetchLikedTracksPage(
   };
 }
 
+async function addTrackBatchesSequentially(
+  playlistId: string,
+  batches: string[][],
+  accessToken: string,
+  index = 0
+): Promise<number> {
+  if (index >= batches.length) return 0;
+  const batch = batches[index];
+  const addRes = await fetch(`${SPOTIFY_API_BASE_URL}/playlists/${playlistId}/tracks`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      uris: batch,
+    }),
+  });
+
+  if (!addRes.ok) {
+    const errText = await addRes.text();
+    throw new Error(`Failed to add tracks to playlist: ${addRes.status} ${errText}`);
+  }
+
+  const nextCount = await addTrackBatchesSequentially(playlistId, batches, accessToken, index + 1);
+  return batch.length + nextCount;
+}
+
 export async function createOrUpdateYearlyPlaylist(input: CreatePlaylistInput) {
-  const accessToken = await getValidAccessToken();
-  const session = await getSession();
+  // Concurrently resolve token and session
+  const [accessToken, session] = await Promise.all([getValidAccessToken(), getSession()]);
   const userId = session.user?.id;
 
   if (!userId) {
@@ -161,10 +191,8 @@ export async function createOrUpdateYearlyPlaylist(input: CreatePlaylistInput) {
   // 3. Add tracks in batches of up to 100
   const uniqueUris = Array.from(new Set(input.trackUris));
   const BATCH_SIZE = 100;
-  let addedCount = 0;
 
-  for (let i = 0; i < uniqueUris.length; i += BATCH_SIZE) {
-    const batch = uniqueUris.slice(i, i + BATCH_SIZE);
+  if (uniqueUris.length <= BATCH_SIZE) {
     const addRes = await fetch(`${SPOTIFY_API_BASE_URL}/playlists/${playlistId}/tracks`, {
       method: "POST",
       headers: {
@@ -172,7 +200,7 @@ export async function createOrUpdateYearlyPlaylist(input: CreatePlaylistInput) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        uris: batch,
+        uris: uniqueUris,
       }),
     });
 
@@ -181,14 +209,28 @@ export async function createOrUpdateYearlyPlaylist(input: CreatePlaylistInput) {
       throw new Error(`Failed to add tracks to playlist: ${addRes.status} ${errText}`);
     }
 
-    addedCount += batch.length;
+    return {
+      playlistId,
+      playlistUrl,
+      name: playlistName,
+      year: input.year,
+      addedCount: uniqueUris.length,
+    };
   }
+
+  const batches: string[][] = [];
+  for (let i = 0; i < uniqueUris.length; i += BATCH_SIZE) {
+    batches.push(uniqueUris.slice(i, i + BATCH_SIZE));
+  }
+
+  // Sequentially process batches to strictly preserve track order and prevent 409/429 concurrency errors
+  const totalAdded = await addTrackBatchesSequentially(playlistId, batches, accessToken);
 
   return {
     playlistId,
     playlistUrl,
     name: playlistName,
     year: input.year,
-    addedCount,
+    addedCount: totalAdded,
   };
 }

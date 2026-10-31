@@ -1,0 +1,11 @@
+.next
+node_modules
+dist
+build
+out
+coverage
+bun.lock
+.vercel
+.codegraph
+.atl
+odd

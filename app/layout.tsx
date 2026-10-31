@@ -8,11 +8,7 @@ export const metadata: Metadata = {
   description: "Organiza tus canciones favoritas de Spotify en playlists por año automáticamente",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
       <body>

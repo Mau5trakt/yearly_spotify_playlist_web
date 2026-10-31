@@ -49,8 +49,6 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Authentication failed";
-    return NextResponse.redirect(
-      new URL(`/?auth_error=${encodeURIComponent(message)}`, origin)
-    );
+    return NextResponse.redirect(new URL(`/?auth_error=${encodeURIComponent(message)}`, origin));
   }
 }

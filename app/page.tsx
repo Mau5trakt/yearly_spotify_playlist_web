@@ -47,7 +47,8 @@ function PageContent() {
       </main>
 
       <footer className={styles.footer}>
-        Yearly Spotify Playlists &copy; {new Date().getFullYear()} — Desarrollado con Next.js, React y Bun
+        Yearly Spotify Playlists &copy; {new Date().getFullYear()} — Desarrollado con Next.js, React
+        y Bun
       </footer>
     </div>
   );
