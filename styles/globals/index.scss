@@ -1,0 +1,10 @@
+// ==========================================
+// Central Global Abstractions Hub
+// Safe for @use "@/styles/globals" as * in *.module.scss
+// Emits 0 direct CSS rules to prevent "Selector is not pure" errors
+// ==========================================
+@forward "./variables";
+@forward "./text_colors";
+@forward "./typography";
+@forward "./auxiliars";
+@forward "./mixins";

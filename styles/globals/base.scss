@@ -1,0 +1,37 @@
+@use "./text_colors" as *;
+@use "./typography" as *;
+
+// ==========================================
+// Document Base Styles for App Router
+// ==========================================
+body {
+  background-color: $color-bg;
+  color: $color-text-main;
+  font-family: $font-sans;
+}
+
+// Global SVG overflow protection
+svg {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  max-width: 100%;
+}
+
+// Custom dark scrollbar
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: $color-bg;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}

@@ -1,0 +1,116 @@
+@use "../globals" as *;
+
+.statsSection {
+  margin: 2.5rem 0;
+}
+
+.sectionTitle {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: 1.5rem;
+  color: $color-text-main;
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+.kpiCard {
+  @include card;
+  padding: 1.5rem;
+  text-align: center;
+
+  &.highlightCard {
+    border-color: rgba($color-gold, 0.4);
+    background: linear-gradient(180deg, rgba($color-gold, 0.08) 0%, $color-bg-card 100%);
+  }
+
+  .kpiLabel {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+
+  .kpiValue {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-extrabold;
+    color: $color-text-main;
+  }
+
+  .kpiCrown {
+    margin-right: 0.35rem;
+  }
+}
+
+.chartCard {
+  @include card;
+  padding: 1.75rem;
+
+  @include mobile {
+    padding: 1.25rem 1rem;
+  }
+}
+
+.barRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  @include mobile {
+    gap: 0.5rem;
+  }
+}
+
+.yearLabel {
+  width: 50px;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-sm;
+  color: $color-text-main;
+}
+
+.barContainer {
+  flex: 1;
+  height: 24px;
+  background-color: $color-bg-input;
+  border-radius: $radius-xs;
+  overflow: hidden;
+  position: relative;
+}
+
+.barFill {
+  height: 100%;
+  background-color: $color-spotify-green;
+  border-radius: $radius-xs;
+  transition: width 0.5s ease-out;
+
+  &.topBar {
+    background: linear-gradient(90deg, #ffd700 0%, #ffaa00 100%);
+  }
+}
+
+.barCount {
+  width: 85px;
+  text-align: right;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $color-text-muted;
+
+  @include mobile {
+    width: 65px;
+  }
+}

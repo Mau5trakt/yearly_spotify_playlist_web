@@ -1,0 +1,151 @@
+@use "../globals" as *;
+
+.heroSection {
+  max-width: $container-max-width;
+  margin: 3.5rem auto 3rem;
+  padding: 0 1.5rem;
+  text-align: center;
+
+  @include tablet {
+    margin: 2rem auto 2rem;
+    padding: 0 1rem;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: $radius-pill;
+  background-color: rgba($color-spotify-green, 0.12);
+  color: $color-spotify-green;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba($color-spotify-green, 0.25);
+}
+
+.title {
+  font-size: $font-size-5xl;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-tight;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.25rem;
+  color: $color-text-main;
+
+  .highlight {
+    color: $color-spotify-green;
+  }
+
+  @include tablet {
+    font-size: $font-size-4xl;
+  }
+
+  @include mobile {
+    font-size: $font-size-2xl;
+  }
+}
+
+.description {
+  font-size: $font-size-lg;
+  line-height: $line-height-relaxed;
+  color: $color-text-muted;
+  max-width: 650px;
+  margin: 0 auto 2.5rem;
+
+  @include tablet {
+    font-size: $font-size-base;
+    margin-bottom: 2rem;
+  }
+}
+
+.errorNotice {
+  background-color: $color-danger-bg;
+  border: 1px solid $color-danger-border;
+  color: #ff8585;
+  padding: 0.85rem 1.25rem;
+  border-radius: $radius-md;
+  margin: 0 auto 1.5rem;
+  max-width: 500px;
+  font-size: $font-size-sm;
+}
+
+.ctaWrapper {
+  margin-bottom: 4rem;
+
+  @include tablet {
+    margin-bottom: 3rem;
+  }
+}
+
+.ctaButton {
+  @include spotify-pill-button;
+  font-size: $font-size-lg;
+  padding: 1rem 2.25rem;
+
+  .btnIcon {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px;
+    min-height: 24px;
+    max-width: 24px;
+    max-height: 24px;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+
+  @include mobile {
+    width: 100%;
+    max-width: 320px;
+    padding: 0.85rem 1.5rem;
+    font-size: $font-size-base;
+  }
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  text-align: left;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+.featureCard {
+  @include card;
+  padding: 1.75rem;
+
+  &:hover {
+    border-color: rgba($color-spotify-green, 0.4);
+    background-color: $color-bg-card-hover;
+    transform: translateY(-4px);
+  }
+
+  .cardNumber {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba($color-spotify-green, 0.15);
+    color: $color-spotify-green;
+    @include flex-center;
+    font-weight: $font-weight-extrabold;
+    margin-bottom: 1rem;
+  }
+
+  .cardTitle {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    margin-bottom: 0.5rem;
+    color: $color-text-main;
+  }
+
+  .cardText {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    line-height: $line-height-normal;
+  }
+}

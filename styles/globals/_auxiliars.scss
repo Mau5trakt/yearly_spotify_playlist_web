@@ -1,0 +1,21 @@
+@use "./text_colors" as *;
+
+// ==========================================
+// Box Shadows
+// ==========================================
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+$shadow-card: 0 8px 24px rgba(0, 0, 0, 0.5);
+$shadow-glow: 0 0 16px rgba($color-spotify-green, 0.25);
+
+// ==========================================
+// Transitions
+// ==========================================
+$transition-fast: all 0.15s ease-in-out;
+$transition-default: all 0.25s cubic-bezier(0.3, 0, 0, 1);
+
+// ==========================================
+// Z-Index Layers
+// ==========================================
+$z-header: 50;
+$z-modal: 100;
+$z-tooltip: 150;

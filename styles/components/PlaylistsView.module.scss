@@ -1,0 +1,76 @@
+@use "../globals" as *;
+
+.playlistsSection {
+  margin: 2.5rem 0;
+}
+
+.title {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: 1.5rem;
+  color: $color-text-main;
+}
+
+.playlistGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.playlistCard {
+  @include card;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &:hover {
+    background-color: $color-bg-card-hover;
+    border-color: rgba($color-spotify-green, 0.5);
+    transform: translateY(-2px);
+  }
+}
+
+.cardHeader {
+  @include flex-between;
+  margin-bottom: 0.75rem;
+}
+
+.playlistYear {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-extrabold;
+  color: $color-text-main;
+}
+
+.trackBadge {
+  background-color: rgba($color-spotify-green, 0.15);
+  color: $color-spotify-green;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  padding: 0.25rem 0.6rem;
+  border-radius: $radius-pill;
+}
+
+.playlistName {
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  margin-bottom: 1.25rem;
+}
+
+.openLink {
+  @include spotify-pill-button;
+  font-size: $font-size-sm;
+  padding: 0.65rem 1rem;
+  box-shadow: none;
+
+  svg {
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px;
+    min-height: 16px;
+  }
+}

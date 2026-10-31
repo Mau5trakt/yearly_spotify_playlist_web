@@ -1,0 +1,94 @@
+@use "../globals" as *;
+
+.dashboardContainer {
+  max-width: 900px;
+  margin: 3rem auto;
+  padding: 0 1.5rem;
+
+  @include tablet {
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+  }
+}
+
+.welcomeCard {
+  @include card;
+  padding: 2.5rem;
+  text-align: center;
+  margin-bottom: 2rem;
+
+  @include tablet {
+    padding: 1.75rem 1.25rem;
+  }
+}
+
+.welcomeTitle {
+  font-size: $font-size-4xl;
+  font-weight: $font-weight-extrabold;
+  margin-bottom: 0.75rem;
+  color: $color-text-main;
+
+  @include tablet {
+    font-size: $font-size-2xl;
+  }
+}
+
+.welcomeSubtitle {
+  font-size: $font-size-lg;
+  color: $color-text-muted;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  line-height: $line-height-normal;
+
+  @include tablet {
+    font-size: $font-size-sm;
+  }
+}
+
+.primaryButton {
+  @include spotify-pill-button;
+  padding: 1rem 2.5rem;
+  font-size: $font-size-lg;
+
+  svg {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px;
+    min-height: 24px;
+    flex-shrink: 0;
+  }
+
+  @include mobile {
+    width: 100%;
+    padding: 0.85rem 1.5rem;
+    font-size: $font-size-base;
+  }
+}
+
+.secondaryButton {
+  background-color: transparent;
+  color: $color-text-main;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  padding: 0.75rem 1.75rem;
+  border-radius: $radius-pill;
+  border: 1px solid $color-border;
+  cursor: pointer;
+  transition: $transition-default;
+  margin-top: 1rem;
+
+  &:hover {
+    border-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.errorBanner {
+  background-color: $color-danger-bg;
+  border: 1px solid $color-danger-border;
+  color: #ff8585;
+  padding: 1.25rem;
+  border-radius: $radius-md;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}

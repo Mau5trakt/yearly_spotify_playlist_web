@@ -1,0 +1,81 @@
+@use "./variables" as *;
+@use "./text_colors" as *;
+@use "./typography" as *;
+@use "./auxiliars" as *;
+
+// ==========================================
+// Responsive Media Queries
+// ==========================================
+@mixin mobile {
+  @media (max-width: $bp-mobile) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: $bp-tablet) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $bp-desktop) {
+    @content;
+  }
+}
+
+// ==========================================
+// Layout & Flexbox Helpers
+// ==========================================
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// ==========================================
+// Component & UI Mixins
+// ==========================================
+@mixin card {
+  background-color: $color-bg-card;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  transition: $transition-default;
+}
+
+@mixin spotify-pill-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background-color: $color-spotify-green;
+  color: #000000;
+  font-weight: $font-weight-bold;
+  border-radius: $radius-pill;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: $transition-default;
+  box-shadow: $shadow-glow;
+
+  &:hover:not(:disabled) {
+    background-color: $color-spotify-green-hover;
+    transform: scale(1.03);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

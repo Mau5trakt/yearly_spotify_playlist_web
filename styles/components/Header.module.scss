@@ -1,0 +1,100 @@
+@use "../globals" as *;
+
+.header {
+  @include flex-between;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid $color-border;
+  background-color: rgba($color-bg, 0.9);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: $z-header;
+
+  @include tablet {
+    padding: 0.85rem 1.25rem;
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-lg;
+  color: $color-text-main;
+
+  .logoIcon {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px;
+    min-height: 32px;
+    max-width: 32px;
+    max-height: 32px;
+    fill: $color-spotify-green;
+  }
+
+  @include mobile {
+    font-size: $font-size-base;
+  }
+}
+
+.userSection {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.userBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background-color: $color-bg-card;
+  padding: 0.35rem 0.75rem;
+  border-radius: $radius-pill;
+  border: 1px solid $color-border;
+
+  .avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .avatarPlaceholder {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: $color-spotify-green;
+    color: #000;
+    font-weight: $font-weight-bold;
+    @include flex-center;
+    font-size: $font-size-xs;
+  }
+
+  .userName {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text-main;
+
+    @include mobile {
+      display: none;
+    }
+  }
+}
+
+.logoutBtn {
+  background: transparent;
+  color: $color-text-muted;
+  border: 1px solid $color-border;
+  border-radius: $radius-pill;
+  padding: 0.4rem 0.85rem;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: $transition-default;
+
+  &:hover {
+    color: $color-text-main;
+    border-color: #ffffff;
+  }
+}
