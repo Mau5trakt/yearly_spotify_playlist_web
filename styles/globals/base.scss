@@ -36,19 +36,45 @@ svg {
   background: #555555;
 }
 
-// Sileo toast dark-theme high-contrast overrides
+// Sileo toast dark-theme high-contrast & persistent card overrides
+[data-sileo-viewport][data-position="top-right"] {
+  right: 36px !important;
+  top: 24px !important;
+}
+
 [data-sileo-toast] {
-  --sileo-width: 380px;
+  --sileo-width: 420px;
+  width: 420px !important;
+  max-width: calc(100vw - 3rem) !important;
+  height: auto !important;
+  min-height: 120px;
+  background-color: #141414 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.75) !important;
+  cursor: default !important;
+  overflow: visible !important;
   color: #ffffff !important;
 }
 
-[data-sileo-title] {
-  color: #ffffff !important;
-  font-weight: 700 !important;
+[data-sileo-canvas] {
   display: none !important;
 }
 
+[data-sileo-header] {
+  display: none !important;
+}
+
+[data-sileo-content] {
+  position: static !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  content-visibility: visible !important;
+}
+
 [data-sileo-description] {
+  padding: 1rem 1.25rem !important;
   color: #ffffff !important;
-  padding: 0.85rem 1rem !important;
+  contain: none !important;
+  content-visibility: visible !important;
 }

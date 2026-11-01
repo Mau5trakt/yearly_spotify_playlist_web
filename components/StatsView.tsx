@@ -30,11 +30,20 @@ function EarliestToastContent({
     <div className={styles.sileoCard}>
       <div className={styles.sileoHeader}>
         <span className={styles.sileoBadge}>⭐ {badgeText}</span>
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             onClose();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              e.stopPropagation();
+              onClose();
+            }
           }}
           className={styles.sileoCloseBtn}
           aria-label="Close notification"
@@ -42,7 +51,7 @@ function EarliestToastContent({
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
           </svg>
-        </button>
+        </div>
       </div>
 
       <div className={styles.sileoBody}>
@@ -99,19 +108,14 @@ export function StatsView({ stats }: StatsViewProps) {
     const savedOnText = t("earliestTrack.savedOn", { date: addedDate });
     const badgeText = t("earliestTrack.badge");
 
-    let toastId = "";
-    toastId = sileo.show({
+    sileo.show({
       description: (
         <EarliestToastContent
           track={earliestSavedTrack}
           badgeText={badgeText}
           savedOnText={savedOnText}
           onClose={() => {
-            if (toastId) {
-              sileo.dismiss(toastId);
-            } else {
-              sileo.clear();
-            }
+            sileo.clear();
           }}
         />
       ),
@@ -119,6 +123,10 @@ export function StatsView({ stats }: StatsViewProps) {
       position,
       fill: "#141414",
     });
+
+    return () => {
+      sileo.clear();
+    };
   }, [earliestSavedTrack, t]);
 
   useEffect(() => {

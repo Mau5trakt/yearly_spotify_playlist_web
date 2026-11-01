@@ -211,28 +211,27 @@
 }
 
 .sileoSongTitle {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #ffffff !important;
-  line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.35;
+  white-space: normal !important;
+  word-break: break-word;
 }
 
 .sileoSongArtist {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: #ffffff !important;
-  margin-top: 0.2rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  margin-top: 0.35rem;
+  white-space: normal !important;
+  word-break: break-word;
+  line-height: 1.35;
 }
 
 .sileoDate {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.85) !important;
-  margin-top: 0.3rem;
+  margin-top: 0.35rem;
 }
