@@ -138,6 +138,14 @@ export function useSpotifySync() {
           isPublic: true,
         });
 
+        const yearCoverImages = Array.from(
+          new Set(
+            group.tracks
+              .map((t) => t.album.imageUrl)
+              .filter((url): url is string => typeof url === "string" && url.trim().length > 0)
+          )
+        );
+
         createdPlaylists.push({
           year,
           name: result.name,
@@ -145,6 +153,7 @@ export function useSpotifySync() {
           addedCount: result.addedCount,
           skippedCount: result.skippedCount,
           alreadyExisted: result.alreadyExisted,
+          coverImages: yearCoverImages,
         });
 
         store.setCreatedPlaylists([...createdPlaylists]);

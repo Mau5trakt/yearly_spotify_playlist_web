@@ -11,6 +11,7 @@ export interface CreatedPlaylistRecord {
   addedCount: number;
   skippedCount?: number;
   alreadyExisted?: boolean;
+  coverImages?: string[];
 }
 
 export interface CreatingPlaylistState {

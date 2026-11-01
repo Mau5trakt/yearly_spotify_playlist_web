@@ -68,9 +68,9 @@ export function PlaylistCreationToast({
     }
   }, [year]);
 
-  // Rotate images every 500ms following the 4-quadrant directional sequence
+  // Rotate images every 500ms following the 4-quadrant directional sequence (only if >= 4 images)
   useEffect(() => {
-    if (imagePool.length === 0) return;
+    if (imagePool.length < 4) return;
 
     const interval = setInterval(() => {
       const qIndex = stepRef.current % 4;
@@ -140,33 +140,55 @@ export function PlaylistCreationToast({
       aria-live="polite"
       data-testid="playlist-creation-toast"
     >
-      {/* 2x2 Collage Container on the left */}
-      <div className={styles.collageWrapper} data-testid="collage-grid">
-        {quadrantImages.map((src, i) => (
-          <div
-            key={i}
-            ref={(el) => {
-              quadrantRefs.current[i] = el;
-            }}
-            className={styles.quadrant}
-            data-testid={`quadrant-${i}`}
-          >
-            {src ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={src}
-                alt=""
-                className={styles.quadrantImage}
-                width={40}
-                height={40}
-                loading="eager"
-              />
-            ) : (
-              <div className={styles.quadrantPlaceholder} />
-            )}
-          </div>
-        ))}
-      </div>
+      {/* Collage or Single Cover on the left */}
+      {imagePool.length >= 4 ? (
+        <div className={styles.collageWrapper} data-testid="collage-grid">
+          {quadrantImages.map((src, i) => (
+            <div
+              key={i}
+              ref={(el) => {
+                quadrantRefs.current[i] = el;
+              }}
+              className={styles.quadrant}
+              data-testid={`quadrant-${i}`}
+            >
+              {src ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={src}
+                  alt=""
+                  className={styles.quadrantImage}
+                  width={40}
+                  height={40}
+                  loading="eager"
+                />
+              ) : (
+                <div className={styles.quadrantPlaceholder} />
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className={styles.singleCoverWrapper} data-testid="single-cover-grid">
+          {imagePool.length > 0 ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imagePool[0]}
+              alt=""
+              className={styles.singleCoverImage}
+              width={80}
+              height={80}
+              loading="eager"
+            />
+          ) : (
+            <div className={styles.singleCoverPlaceholder}>
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+              </svg>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Info Section on the right */}
       <div className={styles.infoSection}>

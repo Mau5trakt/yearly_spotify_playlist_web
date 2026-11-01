@@ -57,7 +57,28 @@ describe("PlaylistCreationToast Component Suite", () => {
     expect(html).toContain("(2/6)");
   });
 
-  it("handles empty or missing album image URLs gracefully with placeholders", () => {
+  it("renders single 1x1 cover when playlist has fewer than 4 images (< 4 validation)", () => {
+    const tracksWithTwoImages = [
+      mockTrack("1", "https://example.com/single.jpg"),
+      mockTrack("2", "https://example.com/second.jpg"),
+    ];
+
+    const html = renderToString(
+      React.createElement(PlaylistCreationToast, {
+        year: 2022,
+        current: 1,
+        total: 3,
+        trackCount: 2,
+        tracks: tracksWithTwoImages,
+      })
+    );
+
+    expect(html).toContain('data-testid="single-cover-grid"');
+    expect(html).not.toContain('data-testid="collage-grid"');
+    expect(html).toContain("https://example.com/single.jpg");
+  });
+
+  it("handles empty or missing album image URLs gracefully with single placeholder", () => {
     const tracksWithoutImages = [mockTrack("1"), mockTrack("2")];
 
     const html = renderToString(
@@ -70,7 +91,8 @@ describe("PlaylistCreationToast Component Suite", () => {
       })
     );
 
-    expect(html).toContain('data-testid="collage-grid"');
+    expect(html).toContain('data-testid="single-cover-grid"');
+    expect(html).not.toContain('data-testid="collage-grid"');
     expect(html).toContain("2020");
     expect(html).toContain("15 tracks");
   });

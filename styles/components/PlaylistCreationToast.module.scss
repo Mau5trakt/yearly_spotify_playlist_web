@@ -40,6 +40,36 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.singleCoverWrapper {
+  width: 80px;
+  height: 80px;
+  min-width: 80px;
+  min-height: 80px;
+  max-width: 80px;
+  max-height: 80px;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  position: relative;
+  background-color: $color-bg-input;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.singleCoverImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.singleCoverPlaceholder {
+  width: 100%;
+  height: 100%;
+  @include flex-center;
+  color: $color-spotify-green;
+  background-color: $color-bg-input;
+}
+
 .quadrant {
   width: 100%;
   height: 100%;
