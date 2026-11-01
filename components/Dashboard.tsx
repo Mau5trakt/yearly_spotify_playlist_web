@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useSpotifySync } from "@/hooks";
-import { ProgressBar, StatsView, PlaylistsView } from "@/components";
+import { ProgressBar, StatsView, PlaylistsView, EarliestTrackToast } from "@/components";
 import { useTranslation } from "@/lib/i18n";
 import styles from "@/styles/components/Dashboard.module.scss";
 
@@ -15,6 +16,8 @@ interface DashboardProps {
 
 export function Dashboard({ user }: DashboardProps) {
   const { t } = useTranslation();
+  const [toastDismissed, setToastDismissed] = useState(false);
+
   const {
     status,
     totalTracks,
@@ -24,6 +27,7 @@ export function Dashboard({ user }: DashboardProps) {
     createdPlaylists,
     recentTracks,
     latestTrack,
+    earliestSavedTrack,
     error,
     startSync,
     reset,
@@ -31,15 +35,30 @@ export function Dashboard({ user }: DashboardProps) {
 
   const isWorking = status === "fetching" || status === "analyzing" || status === "creating";
 
+  const handleReset = () => {
+    setToastDismissed(false);
+    reset();
+  };
+
+  const handleStartSync = () => {
+    setToastDismissed(false);
+    startSync();
+  };
+
   return (
     <div className={styles.dashboardContainer}>
+      {/* Earliest track toast stays open indefinitely while on completed status until X clicked or sync restarted */}
+      {status === "completed" && earliestSavedTrack && !toastDismissed && (
+        <EarliestTrackToast track={earliestSavedTrack} onClose={() => setToastDismissed(true)} />
+      )}
+
       {error && (
         <div className={styles.errorBanner}>
           <p>
             <strong>Error:</strong> {error}
           </p>
           <button
-            onClick={reset}
+            onClick={handleReset}
             style={{
               marginTop: "0.5rem",
               background: "transparent",
@@ -61,7 +80,7 @@ export function Dashboard({ user }: DashboardProps) {
           </h1>
           <p className={styles.welcomeSubtitle}>{t("dashboard.welcomeSubtitle")}</p>
 
-          <button onClick={startSync} className={styles.primaryButton}>
+          <button onClick={handleStartSync} className={styles.primaryButton}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M8 5v14l11-7z" />
             </svg>
@@ -88,7 +107,7 @@ export function Dashboard({ user }: DashboardProps) {
               {t("dashboard.completedTitle")}
             </h1>
             <p className={styles.welcomeSubtitle}>{t("dashboard.completedSubtitle")}</p>
-            <button onClick={reset} className={styles.secondaryButton}>
+            <button onClick={handleReset} className={styles.secondaryButton}>
               {t("dashboard.syncAgainButton")}
             </button>
           </div>

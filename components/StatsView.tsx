@@ -2,132 +2,18 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
-import { sileo } from "sileo";
 import type { YearStats } from "@/lib/sync";
-import type { SpotifyTrackItem } from "@/lib/spotify";
 import { useTranslation } from "@/lib/i18n";
-import { useSyncStore } from "@/store/useSyncStore";
 import styles from "@/styles/components/StatsView.module.scss";
 
 interface StatsViewProps {
   stats: YearStats;
 }
 
-interface EarliestToastContentProps {
-  track: SpotifyTrackItem;
-  badgeText: string;
-  savedOnText: string;
-  onClose: () => void;
-}
-
-function EarliestToastContent({
-  track,
-  badgeText,
-  savedOnText,
-  onClose,
-}: EarliestToastContentProps) {
-  return (
-    <div className={styles.sileoCard}>
-      <div className={styles.sileoHeader}>
-        <span className={styles.sileoBadge}>⭐ {badgeText}</span>
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onClose();
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              e.stopPropagation();
-              onClose();
-            }
-          }}
-          className={styles.sileoCloseBtn}
-          aria-label="Close notification"
-        >
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-          </svg>
-        </div>
-      </div>
-
-      <div className={styles.sileoBody}>
-        {track.album.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={track.album.imageUrl}
-            alt={track.name}
-            className={styles.sileoCover}
-            width={64}
-            height={64}
-          />
-        ) : (
-          <div className={styles.sileoCoverPlaceholder}>
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-            </svg>
-          </div>
-        )}
-
-        <div className={styles.sileoContent}>
-          <div className={styles.sileoSongTitle} title={track.name}>
-            {track.name}
-          </div>
-          <div className={styles.sileoSongArtist} title={track.artists.join(", ")}>
-            {track.artists.join(", ")}
-          </div>
-          <div className={styles.sileoDate}>{savedOnText}</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function StatsView({ stats }: StatsViewProps) {
   const { t } = useTranslation();
-  const earliestSavedTrack = useSyncStore((state) => state.earliestSavedTrack);
   const maxCount = stats.topYear?.count || 1;
   const sectionRef = useRef<HTMLDivElement>(null);
-  const toastTriggeredRef = useRef(false);
-
-  useEffect(() => {
-    if (!earliestSavedTrack || toastTriggeredRef.current) return;
-    toastTriggeredRef.current = true;
-
-    // Position on top-right for desktop and tablet; bottom-center for mobile
-    const isDesktopOrTablet = typeof window !== "undefined" ? window.innerWidth >= 768 : true;
-    const position = isDesktopOrTablet ? "top-right" : "bottom-center";
-
-    const addedDate = earliestSavedTrack.addedAt
-      ? new Date(earliestSavedTrack.addedAt).toLocaleDateString()
-      : String(earliestSavedTrack.year);
-
-    const savedOnText = t("earliestTrack.savedOn", { date: addedDate });
-    const badgeText = t("earliestTrack.badge");
-
-    sileo.show({
-      description: (
-        <EarliestToastContent
-          track={earliestSavedTrack}
-          badgeText={badgeText}
-          savedOnText={savedOnText}
-          onClose={() => {
-            sileo.clear();
-          }}
-        />
-      ),
-      duration: null, // Stays open indefinitely until dismissed via the "X" button
-      position,
-      fill: "#141414",
-    });
-
-    return () => {
-      sileo.clear();
-    };
-  }, [earliestSavedTrack, t]);
 
   useEffect(() => {
     if (!sectionRef.current) return;

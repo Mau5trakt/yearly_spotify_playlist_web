@@ -6,7 +6,7 @@ import * as spotify from "../lib/spotify";
 import * as sync from "../lib/sync";
 
 describe("Architecture & Barrel Imports Suite", () => {
-  it("exports all 8 UI components through the components/ barrel export", () => {
+  it("exports all 9 UI components through the components/ barrel export", () => {
     expect(components.Header).toBeDefined();
     expect(components.LandingHero).toBeDefined();
     expect(components.Dashboard).toBeDefined();
@@ -15,6 +15,7 @@ describe("Architecture & Barrel Imports Suite", () => {
     expect(components.PlaylistsView).toBeDefined();
     expect(components.LiveTrackToasts).toBeDefined();
     expect(components.PlaylistCreationToast).toBeDefined();
+    expect(components.EarliestTrackToast).toBeDefined();
   });
 
   it("exports auth responsibilities through lib/auth barrel", () => {

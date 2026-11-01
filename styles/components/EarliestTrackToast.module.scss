@@ -1,0 +1,138 @@
+@use "../globals" as *;
+
+.toastWrapper {
+  position: fixed;
+  top: 24px;
+  right: 36px;
+  z-index: $z-modal;
+  max-width: 420px;
+  width: calc(100vw - 48px);
+  background-color: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: $radius-lg;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.75);
+  padding: 1rem 1.25rem;
+  color: #ffffff;
+  pointer-events: auto;
+
+  @include mobile {
+    right: 16px;
+    left: 16px;
+    width: auto;
+    max-width: none;
+    top: auto;
+    bottom: 24px;
+  }
+}
+
+.toastHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $color-spotify-green;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 6px;
+  margin: -6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.08);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    fill: #ffffff;
+  }
+}
+
+.toastBody {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.albumCover {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  min-height: 64px;
+  border-radius: $radius-sm;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.coverPlaceholder {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  min-height: 64px;
+  border-radius: $radius-sm;
+  background-color: $color-bg-input;
+  @include flex-center;
+  color: $color-spotify-green;
+  flex-shrink: 0;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.trackDetails {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.songTitle {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff !important;
+  line-height: 1.35;
+  white-space: normal !important;
+  word-break: break-word;
+}
+
+.artistName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  margin-top: 0.35rem;
+  white-space: normal !important;
+  word-break: break-word;
+  line-height: 1.35;
+}
+
+.savedDate {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85) !important;
+  margin-top: 0.35rem;
+}
