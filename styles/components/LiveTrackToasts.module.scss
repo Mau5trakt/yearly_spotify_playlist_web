@@ -11,8 +11,6 @@
 .trackList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  will-change: transform;
 }
 
 .toastCard {
@@ -27,6 +25,12 @@
   border: 1px solid $color-border;
   box-shadow: $shadow-sm;
   flex-shrink: 0;
+  overflow: hidden;
+  margin-bottom: 8px;
+  // Override card's transition: all to prevent CSS transition engine from fighting GSAP tweens
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     border-color: rgba($color-spotify-green, 0.4);
@@ -54,6 +58,7 @@
   object-fit: cover;
   display: block;
   border-radius: $radius-sm;
+  transition: opacity 0.2s ease-in-out;
 }
 
 .coverPlaceholder {

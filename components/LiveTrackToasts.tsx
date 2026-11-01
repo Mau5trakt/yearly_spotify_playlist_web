@@ -15,8 +15,54 @@ interface ToastItem {
   track: SpotifyTrackItem;
 }
 
-const CARD_TOTAL_HEIGHT = 88; // 80px card + 8px gap
 const EMPTY_TRACKS: SpotifyTrackItem[] = [];
+const ANIM_DURATION = 0.24;
+
+function TrackCoverImage({ src, alt }: { src: string; alt: string }) {
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
+      setLoaded(true);
+    }
+  }, []);
+
+  if (error) {
+    return (
+      <div className={styles.coverPlaceholder} data-testid="cover-placeholder">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+        </svg>
+      </div>
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      ref={imgRef}
+      src={src}
+      alt={alt}
+      className={styles.coverImage}
+      data-testid="cover-image"
+      width={64}
+      height={64}
+      loading="eager"
+      decoding="async"
+      onLoad={() => setLoaded(true)}
+      onError={() => setError(true)}
+      style={{
+        width: "64px",
+        height: "64px",
+        objectFit: "cover",
+        borderRadius: "8px",
+        opacity: loaded ? 1 : 0,
+      }}
+    />
+  );
+}
 
 export function LiveTrackToasts({
   tracks = EMPTY_TRACKS,
@@ -52,52 +98,78 @@ export function LiveTrackToasts({
       setItems((prev) => [...prev, newItem]);
       isAnimatingRef.current = true;
 
-      const animTimer = setTimeout(() => {
+      // Synchronize with next browser frame after React DOM mount
+      requestAnimationFrame(() => {
         if (!trackListRef.current) {
           isAnimatingRef.current = false;
           return;
         }
 
         const totalItems = trackListRef.current.children.length;
+        const lastCard = trackListRef.current.children[totalItems - 1] as HTMLElement | undefined;
 
         if (totalItems <= 5) {
-          const lastCard = trackListRef.current.children[totalItems - 1];
           if (lastCard) {
             gsap.fromTo(
               lastCard,
-              { opacity: 0, y: 16, scale: 0.96 },
-              { opacity: 1, y: 0, scale: 1, duration: 0.28, ease: "power2.out" }
+              { opacity: 0, y: 14, scale: 0.98 },
+              {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: ANIM_DURATION,
+                ease: "power2.out",
+                onComplete: () => {
+                  isAnimatingRef.current = false;
+                  processNext();
+                },
+              }
+            );
+          } else {
+            isAnimatingRef.current = false;
+            processNext();
+          }
+        } else {
+          // More than 5 items: smoothly collapse the top card and animate the new incoming card
+          const firstCard = trackListRef.current.children[0] as HTMLElement | undefined;
+
+          if (lastCard) {
+            gsap.fromTo(
+              lastCard,
+              { opacity: 0, y: 14, scale: 0.98 },
+              { opacity: 1, y: 0, scale: 1, duration: ANIM_DURATION, ease: "power2.out" }
             );
           }
-          isAnimatingRef.current = false;
-          processNext();
-        } else {
-          gsap.to(trackListRef.current, {
-            y: -CARD_TOTAL_HEIGHT,
-            duration: 0.32,
-            ease: "power2.inOut",
-            onComplete: () => {
-              setItems((current) => current.slice(1));
-              if (trackListRef.current) {
-                gsap.set(trackListRef.current, { y: 0 });
-              }
-              isAnimatingRef.current = false;
-              processNext();
-            },
-          });
+
+          if (firstCard) {
+            gsap.to(firstCard, {
+              height: 0,
+              opacity: 0,
+              paddingTop: 0,
+              paddingBottom: 0,
+              marginBottom: 0,
+              borderTopWidth: 0,
+              borderBottomWidth: 0,
+              duration: ANIM_DURATION,
+              ease: "power2.inOut",
+              onComplete: () => {
+                // Once the top card is 0px tall, borders zeroed and fully transparent,
+                // removing it from state produces 0 layout shift or flicker.
+                setItems((current) => current.slice(1));
+                isAnimatingRef.current = false;
+                processNext();
+              },
+            });
+          } else {
+            setItems((current) => current.slice(1));
+            isAnimatingRef.current = false;
+            processNext();
+          }
         }
-      }, 40);
-
-      return animTimer;
+      });
     };
 
-    const timer = setTimeout(() => {
-      processNext();
-    }, 10);
-
-    return () => {
-      clearTimeout(timer);
-    };
+    processNext();
   }, [latestTrack]);
 
   if (items.length === 0) return null;
@@ -110,23 +182,7 @@ export function LiveTrackToasts({
             {/* Album cover wrapper strictly bounded to 64x64 on the left */}
             <div className={styles.coverWrapper}>
               {item.track.album.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={item.track.album.imageUrl}
-                  alt={item.track.name}
-                  className={styles.coverImage}
-                  data-testid="cover-image"
-                  width={64}
-                  height={64}
-                  loading="eager"
-                  decoding="async"
-                  style={{
-                    width: "64px",
-                    height: "64px",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                  }}
-                />
+                <TrackCoverImage src={item.track.album.imageUrl} alt={item.track.name} />
               ) : (
                 <div className={styles.coverPlaceholder} data-testid="cover-placeholder">
                   <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
