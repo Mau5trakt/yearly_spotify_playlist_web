@@ -13,6 +13,14 @@ export interface CreatedPlaylistRecord {
   alreadyExisted?: boolean;
 }
 
+export interface CreatingPlaylistState {
+  year: number;
+  current: number;
+  total: number;
+  count: number;
+  tracks: SpotifyTrackItem[];
+}
+
 interface SyncState {
   status: SyncStatus;
   totalTracks: number;
@@ -22,6 +30,8 @@ interface SyncState {
   createdPlaylists: CreatedPlaylistRecord[];
   recentTracks: SpotifyTrackItem[];
   latestTrack: SpotifyTrackItem | null;
+  earliestSavedTrack: SpotifyTrackItem | null;
+  creatingPlaylist: CreatingPlaylistState | null;
   error: string | null;
 
   startSyncSession: () => void;
@@ -32,6 +42,8 @@ interface SyncState {
   setStatus: (status: SyncStatus) => void;
   setStats: (stats: YearStats) => void;
   setCreatedPlaylists: (playlists: CreatedPlaylistRecord[]) => void;
+  setEarliestSavedTrack: (track: SpotifyTrackItem | null) => void;
+  setCreatingPlaylist: (creating: CreatingPlaylistState | null) => void;
   setCompleted: (actionMessage?: string) => void;
   setError: (error: string) => void;
   reset: () => void;
@@ -49,6 +61,8 @@ export const useSyncStore = create<SyncState>((set) => ({
   createdPlaylists: [],
   recentTracks: [],
   latestTrack: null,
+  earliestSavedTrack: null,
+  creatingPlaylist: null,
   error: null,
 
   reset: () => {
@@ -66,6 +80,8 @@ export const useSyncStore = create<SyncState>((set) => ({
       createdPlaylists: [],
       recentTracks: [],
       latestTrack: null,
+      earliestSavedTrack: null,
+      creatingPlaylist: null,
       error: null,
     });
   },
@@ -81,11 +97,13 @@ export const useSyncStore = create<SyncState>((set) => ({
       status: "fetching",
       totalTracks: 0,
       fetchedCount: 0,
-      currentAction: "Iniciando descarga de canciones guardadas...",
+      currentAction: "",
       error: null,
       createdPlaylists: [],
       recentTracks: [],
       latestTrack: null,
+      earliestSavedTrack: null,
+      creatingPlaylist: null,
       stats: null,
     });
 
@@ -143,7 +161,6 @@ export const useSyncStore = create<SyncState>((set) => ({
     set({
       totalTracks,
       fetchedCount,
-      currentAction: `Descargadas ${fetchedCount} de ${totalTracks} canciones...`,
     }),
 
   setStatus: (status: SyncStatus) => set({ status }),
@@ -152,11 +169,16 @@ export const useSyncStore = create<SyncState>((set) => ({
 
   setCreatedPlaylists: (createdPlaylists: CreatedPlaylistRecord[]) => set({ createdPlaylists }),
 
-  setCompleted: (
-    actionMessage = "¡Listo! Todas tus playlists anuales han sido generadas con éxito."
-  ) =>
+  setEarliestSavedTrack: (earliestSavedTrack: SpotifyTrackItem | null) =>
+    set({ earliestSavedTrack }),
+
+  setCreatingPlaylist: (creatingPlaylist: CreatingPlaylistState | null) =>
+    set({ creatingPlaylist }),
+
+  setCompleted: (actionMessage = "All done! Your yearly playlists were successfully created.") =>
     set({
       status: "completed",
+      creatingPlaylist: null,
       currentAction: actionMessage,
     }),
 

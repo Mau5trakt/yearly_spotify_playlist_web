@@ -2,9 +2,11 @@ import { describe, expect, it } from "bun:test";
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { Header, LandingHero, ProgressBar, StatsView, LiveTrackToasts } from "../components";
+import { useI18nStore } from "../lib/i18n";
 
 describe("Component Rendering & SVG Safety Suite", () => {
   it("renders Header with explicitly sized SVG logo (width=32, height=32)", () => {
+    useI18nStore.getState().setLocale("en");
     const html = renderToString(React.createElement(Header, { user: null }));
     expect(html).toContain('width="32"');
     expect(html).toContain('height="32"');
@@ -12,6 +14,7 @@ describe("Component Rendering & SVG Safety Suite", () => {
   });
 
   it("renders Header with authenticated user badge and logout button", () => {
+    useI18nStore.getState().setLocale("en");
     const html = renderToString(
       React.createElement(Header, {
         user: { id: "user1", displayName: "Enrique", imageUrl: "https://example.com/avatar.jpg" },
@@ -20,29 +23,31 @@ describe("Component Rendering & SVG Safety Suite", () => {
     );
     expect(html).toContain("Enrique");
     expect(html).toContain("https://example.com/avatar.jpg");
-    expect(html).toContain("Cerrar sesión");
+    expect(html).toContain("Log out");
   });
 
   it("renders LandingHero with explicitly sized Spotify CTA SVG (width=24, height=24)", () => {
+    useI18nStore.getState().setLocale("en");
     const html = renderToString(React.createElement(LandingHero, { authError: null }));
     expect(html).toContain('width="24"');
     expect(html).toContain('height="24"');
-    expect(html).toContain("Iniciar sesión con Spotify");
+    expect(html).toContain("Log in with Spotify");
     expect(html).toContain("/api/auth/login");
   });
 
   it("renders ProgressBar with track counts and percentage width", () => {
+    useI18nStore.getState().setLocale("en");
     const rawHtml = renderToString(
       React.createElement(ProgressBar, {
-        currentAction: "Descargando canciones...",
+        currentAction: "Downloading songs...",
         totalTracks: 100,
         fetchedCount: 50,
         status: "fetching",
       })
     );
     const html = rawHtml.replace(/<!-- -->/g, "");
-    expect(html).toContain("Descargando canciones...");
-    expect(html).toContain("50 de 100 canciones identificadas");
+    expect(html).toContain("Downloading songs...");
+    expect(html).toContain("50 of 100 songs identified");
     expect(html).toContain('role="progressbar"');
     expect(html).toContain('aria-valuenow="25"');
     expect(html).toContain('aria-valuemin="0"');

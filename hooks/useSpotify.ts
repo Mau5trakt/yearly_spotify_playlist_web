@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api";
 import type { TracksPageResponse, CreatePlaylistInput, SpotifyTrackItem } from "@/lib/spotify";
 import { groupTracksByYear, calculateYearStats } from "@/lib/sync";
+import { useTranslation } from "@/lib/i18n";
 import { useSyncStore, type CreatedPlaylistRecord } from "@/store/useSyncStore";
 
 export interface CreatedPlaylistResponse {
@@ -45,6 +46,7 @@ export function useCreatePlaylistMutation() {
 
 export function useSpotifySync() {
   const store = useSyncStore();
+  const { t } = useTranslation();
   const createPlaylistMutation = useCreatePlaylistMutation();
 
   const startSync = async () => {
@@ -53,6 +55,7 @@ export function useSpotifySync() {
     }
 
     store.startSyncSession();
+    store.setCurrentAction(t("progress.fetchingStart"));
 
     try {
       const allTracks: SpotifyTrackItem[] = [];
@@ -62,13 +65,14 @@ export function useSpotifySync() {
 
       // Phase 1: Batch download via Axios
       while (hasMore) {
-        store.setCurrentAction(`Descargando canciones guardadas (${offset}...)...`);
-
         const data = await fetchLikedTracksPageApi(offset, limit);
         allTracks.push(...data.items);
         store.enqueueTracks(data.items);
 
         store.setProgress(data.total, allTracks.length);
+        store.setCurrentAction(
+          t("progress.fetchingProgress", { fetched: allTracks.length, total: data.total })
+        );
 
         offset += limit;
         hasMore = data.hasMore && allTracks.length < data.total;
@@ -77,34 +81,55 @@ export function useSpotifySync() {
       store.stopQueueTicker();
 
       if (allTracks.length === 0) {
-        store.setCompleted("No se encontraron canciones guardadas en tu biblioteca.");
+        store.setCompleted(t("progress.noTracks"));
         return;
       }
 
       // Phase 2: In-memory analysis and stats calculation
       store.setStatus("analyzing");
-      store.setCurrentAction("Analizando canciones y agrupando por año de guardado...");
+      store.setCurrentAction(t("progress.analyzing"));
+
+      // Identify the very first track saved in Spotify history
+      const sortedByAddedAt = [...allTracks].sort(
+        (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime()
+      );
+      const earliestTrack = sortedByAddedAt[0] || null;
+      store.setEarliestSavedTrack(earliestTrack);
 
       const groups = groupTracksByYear(allTracks);
       const stats = calculateYearStats(groups);
       store.setStats(stats);
 
       store.setStatus("creating");
-      store.setCurrentAction(
-        `Se encontraron ${groups.size} años distintos. Preparando creación de playlists...`
-      );
+      store.setCurrentAction(t("progress.preparing", { count: groups.size }));
 
       // Phase 3: Create yearly playlists sequentially via Axios mutation
       const createdPlaylists: CreatedPlaylistRecord[] = [];
       const years = Array.from(groups.keys()).sort((a, b) => b - a);
 
       const syncYearStep = async (index: number) => {
-        if (index >= years.length) return;
+        if (index >= years.length) {
+          store.setCreatingPlaylist(null);
+          return;
+        }
         const year = years[index];
         const group = groups.get(year)!;
 
+        store.setCreatingPlaylist({
+          year,
+          current: index + 1,
+          total: years.length,
+          count: group.tracks.length,
+          tracks: group.tracks,
+        });
+
         store.setCurrentAction(
-          `Creando playlist de ${year} (${index + 1}/${years.length}) con ${group.tracks.length} canciones...`
+          t("progress.creatingStep", {
+            year,
+            current: index + 1,
+            total: years.length,
+            count: group.tracks.length,
+          })
         );
 
         const result = await createPlaylistMutation.mutateAsync({
@@ -128,10 +153,10 @@ export function useSpotifySync() {
 
       await syncYearStep(0);
 
-      store.setCompleted("¡Listo! Todas tus playlists anuales han sido generadas con éxito.");
+      store.setCompleted(t("progress.completed"));
     } catch (err) {
       store.stopQueueTicker();
-      const message = err instanceof Error ? err.message : "Error en la sincronización";
+      const message = err instanceof Error ? err.message : t("progress.error");
       store.setError(message);
     }
   };

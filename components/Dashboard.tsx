@@ -2,6 +2,7 @@
 
 import { useSpotifySync } from "@/hooks";
 import { ProgressBar, StatsView, PlaylistsView } from "@/components";
+import { useTranslation } from "@/lib/i18n";
 import styles from "@/styles/components/Dashboard.module.scss";
 
 interface DashboardProps {
@@ -13,6 +14,7 @@ interface DashboardProps {
 }
 
 export function Dashboard({ user }: DashboardProps) {
+  const { t } = useTranslation();
   const {
     status,
     totalTracks,
@@ -47,24 +49,23 @@ export function Dashboard({ user }: DashboardProps) {
               cursor: "pointer",
             }}
           >
-            Volver a intentar
+            {t("dashboard.retryButton")}
           </button>
         </div>
       )}
 
       {status === "idle" && (
         <div className={styles.welcomeCard}>
-          <h1 className={styles.welcomeTitle}>¡Hola, {user.displayName}!</h1>
-          <p className={styles.welcomeSubtitle}>
-            Todo listo para escanear tus canciones guardadas en Spotify y crear tus playlists
-            anuales de forma automática.
-          </p>
+          <h1 className={styles.welcomeTitle}>
+            {t("dashboard.welcome", { name: user.displayName })}
+          </h1>
+          <p className={styles.welcomeSubtitle}>{t("dashboard.welcomeSubtitle")}</p>
 
           <button onClick={startSync} className={styles.primaryButton}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M8 5v14l11-7z" />
             </svg>
-            <span>Crear mis Playlists Anuales</span>
+            <span>{t("dashboard.generateButton")}</span>
           </button>
         </div>
       )}
@@ -84,14 +85,11 @@ export function Dashboard({ user }: DashboardProps) {
         <div>
           <div className={styles.welcomeCard}>
             <h1 className={styles.welcomeTitle} style={{ color: "#1db954" }}>
-              🎉 ¡Sincronización Completada!
+              {t("dashboard.completedTitle")}
             </h1>
-            <p className={styles.welcomeSubtitle}>
-              Revisá tus estadísticas a continuación o abrí tus nuevas playlists directamente en tu
-              aplicación de Spotify.
-            </p>
+            <p className={styles.welcomeSubtitle}>{t("dashboard.completedSubtitle")}</p>
             <button onClick={reset} className={styles.secondaryButton}>
-              Volver a sincronizar
+              {t("dashboard.syncAgainButton")}
             </button>
           </div>
 

@@ -4,9 +4,11 @@ import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuthQuery, useLogoutMutation } from "@/hooks";
 import { Header, LandingHero, Dashboard } from "@/components";
+import { useTranslation } from "@/lib/i18n";
 import styles from "@/styles/pages/Home.module.scss";
 
 function PageContent() {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const authError = searchParams.get("auth_error");
 
@@ -24,7 +26,7 @@ function PageContent() {
           color: "#b3b3b3",
         }}
       >
-        Cargando sesión...
+        {t("common.loading")}
       </div>
     );
   }
@@ -47,8 +49,7 @@ function PageContent() {
       </main>
 
       <footer className={styles.footer}>
-        Yearly Spotify Playlists &copy; {new Date().getFullYear()} — Desarrollado con Next.js, React
-        y Bun
+        Yearly Spotify Playlists &copy; {new Date().getFullYear()}
       </footer>
     </div>
   );
