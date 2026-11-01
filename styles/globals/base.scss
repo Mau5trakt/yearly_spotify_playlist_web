@@ -35,3 +35,20 @@ svg {
 ::-webkit-scrollbar-thumb:hover {
   background: #555555;
 }
+
+// Sileo toast dark-theme high-contrast overrides
+[data-sileo-toast] {
+  --sileo-width: 380px;
+  color: #ffffff !important;
+}
+
+[data-sileo-title] {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  display: none !important;
+}
+
+[data-sileo-description] {
+  color: #ffffff !important;
+  padding: 0.85rem 1rem !important;
+}

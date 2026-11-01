@@ -114,3 +114,125 @@
     width: 65px;
   }
 }
+
+// ==========================================
+// Sileo Earliest Track Toast Styling
+// ==========================================
+.sileoCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+  color: #ffffff;
+  width: 100%;
+}
+
+.sileoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.sileoBadge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $color-spotify-green;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.sileoCloseBtn {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    fill: #ffffff;
+  }
+}
+
+.sileoBody {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sileoCover {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  min-height: 64px;
+  border-radius: $radius-sm;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sileoCoverPlaceholder {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  min-height: 64px;
+  border-radius: $radius-sm;
+  background-color: $color-bg-input;
+  @include flex-center;
+  color: $color-spotify-green;
+  flex-shrink: 0;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.sileoContent {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.sileoSongTitle {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff !important;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sileoSongArtist {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  margin-top: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sileoDate {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85) !important;
+  margin-top: 0.3rem;
+}
