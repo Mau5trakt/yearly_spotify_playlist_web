@@ -44,6 +44,45 @@
   gap: 0.75rem;
 }
 
+.actionsSection {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.langSwitcher {
+  display: inline-flex;
+  align-items: center;
+  background-color: $color-bg-card;
+  border: 1px solid $color-border;
+  border-radius: $radius-pill;
+  padding: 0.2rem 0.35rem;
+  font-size: $font-size-xs;
+  gap: 0.25rem;
+
+  .langOption {
+    background: transparent;
+    border: none;
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    padding: 0.2rem 0.5rem;
+    border-radius: $radius-pill;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    &:hover {
+      color: $color-text-main;
+    }
+
+    &.active {
+      background-color: $color-spotify-green;
+      color: #000000;
+      font-weight: $font-weight-bold;
+    }
+  }
+}
+
 .userBadge {
   display: flex;
   align-items: center;

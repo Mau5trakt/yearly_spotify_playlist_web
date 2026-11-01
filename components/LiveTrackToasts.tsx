@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import type { SpotifyTrackItem } from "@/lib/spotify";
+import { useTranslation } from "@/lib/i18n";
 import styles from "@/styles/components/LiveTrackToasts.module.scss";
 
 interface LiveTrackToastsProps {
@@ -68,6 +69,7 @@ export function LiveTrackToasts({
   tracks = EMPTY_TRACKS,
   latestTrack = null,
 }: LiveTrackToastsProps) {
+  const { t } = useTranslation();
   const [items, setItems] = useState<ToastItem[]>(() =>
     tracks.slice(-5).map((t, idx) => ({
       id: `${t.id}-${idx}`,
@@ -194,7 +196,9 @@ export function LiveTrackToasts({
 
             {/* Track info on the right */}
             <div className={styles.trackInfo} data-testid="track-info">
-              <span className={styles.badgeLive}>Año {item.track.year}</span>
+              <span className={styles.badgeLive}>
+                {t("toasts.yearBadge", { year: item.track.year })}
+              </span>
               <div className={styles.trackName} title={item.track.name}>
                 {item.track.name}
               </div>

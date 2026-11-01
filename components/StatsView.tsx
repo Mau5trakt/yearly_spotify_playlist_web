@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import type { YearStats } from "@/lib/sync";
+import { useTranslation } from "@/lib/i18n";
 import styles from "@/styles/components/StatsView.module.scss";
 
 interface StatsViewProps {
@@ -10,6 +11,7 @@ interface StatsViewProps {
 }
 
 export function StatsView({ stats }: StatsViewProps) {
+  const { t } = useTranslation();
   const maxCount = stats.topYear?.count || 1;
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -39,16 +41,16 @@ export function StatsView({ stats }: StatsViewProps) {
 
   return (
     <div ref={sectionRef} className={styles.statsSection}>
-      <h2 className={styles.sectionTitle}>Resumen de tu Biblioteca</h2>
+      <h2 className={styles.sectionTitle}>{t("stats.title")}</h2>
 
       <div className={styles.kpiGrid}>
         <div className={styles.kpiCard}>
-          <div className={styles.kpiLabel}>Canciones Guardadas</div>
+          <div className={styles.kpiLabel}>{t("stats.totalTracks")}</div>
           <div className={styles.kpiValue}>{stats.totalTracks.toLocaleString()}</div>
         </div>
 
         <div className={`${styles.kpiCard} ${styles.highlightCard}`}>
-          <div className={styles.kpiLabel}>Año más musical</div>
+          <div className={styles.kpiLabel}>{t("stats.topYear")}</div>
           <div className={styles.kpiValue}>
             <span className={styles.kpiCrown}>👑</span>
             {stats.topYear ? stats.topYear.year : "N/A"}
@@ -56,7 +58,7 @@ export function StatsView({ stats }: StatsViewProps) {
         </div>
 
         <div className={styles.kpiCard}>
-          <div className={styles.kpiLabel}>Rango Temporal</div>
+          <div className={styles.kpiLabel}>{t("stats.timeRange")}</div>
           <div className={styles.kpiValue}>
             {stats.earliestYear && stats.latestYear
               ? `${stats.earliestYear} - ${stats.latestYear}`
@@ -67,7 +69,7 @@ export function StatsView({ stats }: StatsViewProps) {
 
       <div className={styles.chartCard}>
         <h3 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: "1.25rem" }}>
-          Distribución de temas guardados por año
+          {t("stats.distributionTitle")}
         </h3>
 
         {stats.yearDistribution.map((item) => {

@@ -2,6 +2,9 @@
 
 import type { SpotifyTrackItem } from "@/lib/spotify";
 import { LiveTrackToasts } from "./LiveTrackToasts";
+import { PlaylistCreationToast } from "./PlaylistCreationToast";
+import { useTranslation } from "@/lib/i18n";
+import { useSyncStore } from "@/store/useSyncStore";
 import styles from "@/styles/components/ProgressBar.module.scss";
 
 interface ProgressBarProps {
@@ -23,6 +26,8 @@ export function ProgressBar({
   recentTracks = EMPTY_RECENT_TRACKS,
   latestTrack,
 }: ProgressBarProps) {
+  const { t } = useTranslation();
+  const creatingPlaylist = useSyncStore((state) => state.creatingPlaylist);
   let percentage = 0;
   if (status === "fetching" && totalTracks > 0) {
     percentage = Math.min(Math.round((fetchedCount / totalTracks) * 50), 50); // Fetching = 0-50%
@@ -40,7 +45,7 @@ export function ProgressBar({
 
       {totalTracks > 0 && (
         <div className={styles.trackIndicator}>
-          {fetchedCount} de {totalTracks} canciones identificadas
+          {t("progress.songsIdentified", { fetched: fetchedCount, total: totalTracks })}
         </div>
       )}
 
@@ -50,12 +55,22 @@ export function ProgressBar({
         aria-valuenow={percentage}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label="Progreso de sincronización"
+        aria-label={t("progress.progressBarAria")}
       >
         <div className={styles.progressBarFill} style={{ width: `${percentage}%` }} />
       </div>
 
       {status === "fetching" && <LiveTrackToasts latestTrack={latestTrack} tracks={recentTracks} />}
+      {status === "creating" && creatingPlaylist && (
+        <PlaylistCreationToast
+          key={creatingPlaylist.year}
+          year={creatingPlaylist.year}
+          current={creatingPlaylist.current}
+          total={creatingPlaylist.total}
+          trackCount={creatingPlaylist.count}
+          tracks={creatingPlaylist.tracks}
+        />
+      )}
     </div>
   );
 }

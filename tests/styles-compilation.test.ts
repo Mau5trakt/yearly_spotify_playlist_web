@@ -22,6 +22,8 @@ describe("SASS Architecture & Compilation Suite", () => {
     "styles/components/StatsView.module.scss",
     "styles/components/PlaylistsView.module.scss",
     "styles/components/LiveTrackToasts.module.scss",
+    "styles/components/PlaylistCreationToast.module.scss",
+    "styles/components/EarliestTrackToast.module.scss",
     "styles/pages/Home.module.scss",
   ];
 

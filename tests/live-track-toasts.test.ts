@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test";
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { LiveTrackToasts } from "../components";
+import { useI18nStore } from "../lib/i18n";
 import type { SpotifyTrackItem } from "../lib/spotify";
 
 function createMockTrack(id: string, name: string): SpotifyTrackItem {
@@ -75,11 +76,12 @@ describe("LiveTrackToasts TDD Suite", () => {
   });
 
   it("renders track metadata including year badge, song name and artist list", () => {
+    useI18nStore.getState().setLocale("en");
     const track = [createMockTrack("meta-1", "Master of Puppets")];
     const rawHtml = renderToString(React.createElement(LiveTrackToasts, { tracks: track }));
     const html = rawHtml.replace(/<!-- -->/g, "");
 
-    expect(html).toContain("Año 2024");
+    expect(html).toContain("Year 2024");
     expect(html).toContain("Master of Puppets");
     expect(html).toContain("Test Artist");
   });
