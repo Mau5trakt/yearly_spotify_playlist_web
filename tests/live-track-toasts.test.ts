@@ -68,4 +68,19 @@ describe("LiveTrackToasts TDD Suite", () => {
     expect(infoIndex).toBeGreaterThan(-1);
     expect(placeholderIndex).toBeLessThan(infoIndex); // Placeholder icon precedes text info (left alignment)
   });
+
+  it("renders null when tracks list is empty", () => {
+    const html = renderToString(React.createElement(LiveTrackToasts, { tracks: [] }));
+    expect(html).toBe("");
+  });
+
+  it("renders track metadata including year badge, song name and artist list", () => {
+    const track = [createMockTrack("meta-1", "Master of Puppets")];
+    const rawHtml = renderToString(React.createElement(LiveTrackToasts, { tracks: track }));
+    const html = rawHtml.replace(/<!-- -->/g, "");
+
+    expect(html).toContain("Año 2024");
+    expect(html).toContain("Master of Puppets");
+    expect(html).toContain("Test Artist");
+  });
 });
