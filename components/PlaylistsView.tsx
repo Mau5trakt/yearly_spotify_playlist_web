@@ -1,11 +1,109 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 import type { CreatedPlaylistRecord } from "@/store/useSyncStore";
 import { useTranslation } from "@/lib/i18n";
 import styles from "@/styles/components/PlaylistsView.module.scss";
 
 interface PlaylistsViewProps {
   playlists: CreatedPlaylistRecord[];
+}
+
+interface AnimatedCoverGridProps {
+  covers: string[];
+}
+
+function AnimatedCoverGrid({ covers }: AnimatedCoverGridProps) {
+  const [quadrantImages, setQuadrantImages] = useState<string[]>(() => [
+    covers[0],
+    covers[1],
+    covers[2],
+    covers[3],
+  ]);
+
+  const quadrantRefs = useRef<Array<HTMLDivElement | null>>([null, null, null, null]);
+  const stepRef = useRef<number>(0);
+  const poolIndexRef = useRef<number>(4);
+
+  useEffect(() => {
+    if (covers.length < 4) return;
+
+    const interval = setInterval(() => {
+      const qIndex = stepRef.current % 4;
+      stepRef.current += 1;
+
+      const nextUrl = covers[poolIndexRef.current % covers.length];
+      poolIndexRef.current += 1;
+
+      setQuadrantImages((prev) => {
+        const next = [...prev];
+        next[qIndex] = nextUrl;
+        return next;
+      });
+
+      requestAnimationFrame(() => {
+        const cell = quadrantRefs.current[qIndex];
+        if (!cell) return;
+
+        const img = cell.querySelector("img");
+        if (!img) return;
+
+        switch (qIndex) {
+          case 0: // Top-Left: bottom to top
+            gsap.fromTo(
+              img,
+              { yPercent: 100, opacity: 0 },
+              { yPercent: 0, opacity: 1, duration: 0.45, ease: "power2.out" }
+            );
+            break;
+          case 1: // Top-Right: left to right
+            gsap.fromTo(
+              img,
+              { xPercent: -100, opacity: 0 },
+              { xPercent: 0, opacity: 1, duration: 0.45, ease: "power2.out" }
+            );
+            break;
+          case 2: // Bottom-Right: top to bottom
+            gsap.fromTo(
+              img,
+              { yPercent: -100, opacity: 0 },
+              { yPercent: 0, opacity: 1, duration: 0.45, ease: "power2.out" }
+            );
+            break;
+          case 3: // Bottom-Left: left to right
+            gsap.fromTo(
+              img,
+              { xPercent: -100, opacity: 0 },
+              { xPercent: 0, opacity: 1, duration: 0.45, ease: "power2.out" }
+            );
+            break;
+        }
+      });
+    }, 500);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [covers]);
+
+  return (
+    <div className={styles.coverGrid2x2} data-testid="cover-grid-2x2">
+      {quadrantImages.map((url, idx) => (
+        <div
+          key={idx}
+          ref={(el) => {
+            quadrantRefs.current[idx] = el;
+          }}
+          className={styles.coverQuadrant}
+          data-testid={`summary-quadrant-${idx}`}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={url} alt="" className={styles.gridCoverImage} loading="lazy" />
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export function PlaylistsView({ playlists }: PlaylistsViewProps) {
@@ -23,21 +121,10 @@ export function PlaylistsView({ playlists }: PlaylistsViewProps) {
 
           return (
             <div key={p.year} className={styles.playlistCard} data-testid="playlist-summary-card">
-              {/* Cover Artwork header on top of the card: 2x2 grid if >= 4 covers, or single cover if < 4 */}
+              {/* Cover Artwork header on top of the card: animated 2x2 grid if >= 4 covers, or single cover if < 4 */}
               <div className={styles.cardCoverWrapper} data-testid="card-cover-wrapper">
                 {covers.length >= 4 ? (
-                  <div className={styles.coverGrid2x2} data-testid="cover-grid-2x2">
-                    {covers.slice(0, 4).map((url, idx) => (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        key={idx}
-                        src={url}
-                        alt=""
-                        className={styles.gridCoverImage}
-                        loading="lazy"
-                      />
-                    ))}
-                  </div>
+                  <AnimatedCoverGrid covers={covers} />
                 ) : covers.length > 0 ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -64,7 +151,9 @@ export function PlaylistsView({ playlists }: PlaylistsViewProps) {
                     <span className={styles.trackBadge}>
                       {p.skippedCount && p.skippedCount > 0
                         ? p.addedCount === 0
-                          ? t("playlists.upToDateBadge", { count: p.skippedCount })
+                          ? t("playlists.upToDateBadge", {
+                              count: p.skippedCount,
+                            })
                           : t("playlists.deltaBadge", {
                               added: p.addedCount,
                               skipped: p.skippedCount,

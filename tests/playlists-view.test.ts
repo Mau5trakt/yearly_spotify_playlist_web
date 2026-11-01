@@ -29,6 +29,10 @@ describe("PlaylistsView Component Suite", () => {
 
     expect(html).toContain('data-testid="card-cover-wrapper"');
     expect(html).toContain('data-testid="cover-grid-2x2"');
+    expect(html).toContain('data-testid="summary-quadrant-0"');
+    expect(html).toContain('data-testid="summary-quadrant-1"');
+    expect(html).toContain('data-testid="summary-quadrant-2"');
+    expect(html).toContain('data-testid="summary-quadrant-3"');
     expect(html).not.toContain('data-testid="single-card-cover"');
     expect(html).toContain("Liked 2024");
     expect(html).toContain("50 tracks");
